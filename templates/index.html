@@ -24,13 +24,20 @@
         h1 {
             margin-bottom: 10px;
         }
+        .row {
+            display: flex;
+        }
     </style>
 </head>
 <body>
     <h1>Pixel Wars 2</h1>
-    <label>
-        Choose color: <input id="color" type="color">
-    </label>
+    <div class="row">
+        <div class="col">    <label>
+            Choose color: <input id="color" type="color">
+        </label></div>
+        <div class="col"><span id="cooldown"></span></div>
+    </div>
+
     <hr>
     <div id="image">
         {% for pixel in image %}
@@ -41,18 +48,34 @@
 
         var ws = new WebSocket("ws://localhost:8000/ws");
 
+        const parseCookie = str =>
+            str
+            .split(';')
+            .map(v => v.split('='))
+            .reduce((acc, v) => {
+                acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim());
+                return acc;
+            }, {});
+
         function changePixel(event) {
             let pixel = event.target;
             let color = document.getElementById("color")
-            ws.send(event.target.id + ' ' + color.value);
+            let cookies = parseCookie(document.cookie)
+            ws.send(`${event.target.id} ${color.value} ${cookies.player_id}`);
         }
-
+        let cooldown = document.getElementById("cooldown")
         ws.onmessage = function(message) {
-            let msg = message.data.split(' ');
-            let id = msg[0];
-            let color = msg[1];
-            let pixel = document.getElementById(id);
-            pixel.style.backgroundColor = color;
+            if (message.data.includes("cooldown")) {
+                let msg = message.data.split(' ');
+                cooldown.textContent = "You can change color in " + msg[1]
+            } else {
+                let msg = message.data.split(' ');
+                let id = msg[0];
+                let color = msg[1];
+                let pixel = document.getElementById(id);
+                pixel.style.backgroundColor = color;
+                cooldown.textContent = ''
+            }
         }
     </script>
 </body>
