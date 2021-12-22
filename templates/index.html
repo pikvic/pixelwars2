@@ -21,10 +21,17 @@
         .pixel:hover {
             border: 1px solid yellow;
         }
+        h1 {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>Pixel Wars 2</h1>
+    <label>
+        Choose color: <input id="color" type="color">
+    </label>
+    <hr>
     <div id="image">
         {% for pixel in image %}
             <div id="p{{ loop.index }}" class="pixel" onclick="changePixel(event)" style="background-color: {{ pixel }};"></div>
@@ -36,7 +43,8 @@
 
         function changePixel(event) {
             let pixel = event.target;
-            ws.send(event.target.id + ' ' + "orange");
+            let color = document.getElementById("color")
+            ws.send(event.target.id + ' ' + color.value);
         }
 
         ws.onmessage = function(message) {

@@ -43,6 +43,7 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
+            print(data, websocket)
             index_str, color = data.split()
             index = int(index_str.replace('p', '')) - 1
             image[index] = color
