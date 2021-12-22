@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Wars 2</title>
+    <style>
+        #image {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            grid-template-rows: repeat(10, 30px);
+        }
+        .pixel {
+            display: flex;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+        }
+        .pixel:hover {
+            border: 1px solid yellow;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pixel Wars 2</h1>
+    <div id="image">
+        {% for pixel in image %}
+            <div id="p{{ loop.index }}" class="pixel" onclick="changePixel(event)" style="background-color: {{ pixel }};"></div>
+        {% endfor %}
+    </div>
+    <script>
+
+        var ws = new WebSocket("ws://localhost:8000/ws");
+
+        function changePixel(event) {
+            let pixel = event.target;
+            ws.send(event.target.id + ' ' + "orange");
+        }
+
+        ws.onmessage = function(message) {
+            let msg = message.data.split(' ');
+            let id = msg[0];
+            let color = msg[1];
+            let pixel = document.getElementById(id);
+            pixel.style.backgroundColor = color;
+        }
+    </script>
+</body>
+</html>
