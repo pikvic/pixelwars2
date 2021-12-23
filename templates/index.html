@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMCT<pre>  </pre>Pixel  Wars</title>
+    <title>IMCT Pixel Wars</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
         @media (hover: hover) {
@@ -101,7 +101,6 @@
             console.log(phrases.length, index)
             return phrases[index];
         }
-
 
         let protocol = document.location.protocol == "https:" ? "wss" : "ws";
         var ws = new WebSocket(`${protocol}://${document.location.host}/ws`);
