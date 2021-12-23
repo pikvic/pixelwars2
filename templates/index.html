@@ -103,7 +103,7 @@
         }
 
 
-        let protocol = document.location.protocol == "https:" ? "wss:" : "ws";
+        let protocol = document.location.protocol == "https:" ? "wss" : "ws";
         var ws = new WebSocket(`${protocol}://${document.location.host}/ws`);
 
         const parseCookie = str =>
