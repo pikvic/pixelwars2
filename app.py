@@ -8,7 +8,7 @@ import uuid
 
 
 FIELD_SIZE = 50
-CELL_SIZE = 10
+CELL_SIZE = 8
 
 
 def cooldown(player_id, players, timeout=datetime.timedelta(seconds=3)):
@@ -64,6 +64,7 @@ async def root(request: Request):
     if player_id not in players:
         player_id = str(uuid.uuid4())
         players[player_id] = datetime.datetime.now()
+    
     response = templates.TemplateResponse("index.html", {"request": request, "image": image, "field_size": FIELD_SIZE, "cell_size": CELL_SIZE, "online": manager.get_online()})
     response.set_cookie(key='player_id', value=player_id)
     return response
