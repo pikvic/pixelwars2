@@ -7,10 +7,11 @@
     <title>IMCT Pixel Wars</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+       
         @media (hover: hover) {
-        .pixel:hover {
-            border: 1px solid black;
-        }
+            .pixel:hover {
+                border: 1px solid black;
+            }
         }
         html {
             height: 100%;
@@ -43,8 +44,8 @@
             border: black 2px solid;
             width: fit-content;
             margin: 10px auto;
-            grid-template-columns: repeat({{ field_size }}, minmax(0.5vw, {{ cell_size }}px));
-            grid-template-rows: repeat({{ field_size }}, minmax(0.5vw, {{ cell_size }}px));
+            grid-template-columns: repeat({{ field_size }}, 12px);
+            grid-template-rows: repeat({{ field_size }}, 12px);
         }
         .pixel {
             display: flex;
@@ -63,6 +64,25 @@
             display: flex;
             width: fit-content;
             margin: 10px auto;
+        }
+
+        @media screen and (max-width: 600px) {
+            body {
+                font-size: 0.8em;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
+
+            #image {
+                grid-template-columns: repeat({{ field_size }}, 7px);
+                grid-template-rows: repeat({{ field_size }}, 7px);
+            }
+           
+                    
         }
     </style>
 </head>
