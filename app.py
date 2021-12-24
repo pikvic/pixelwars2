@@ -24,7 +24,7 @@ R = aioredis.from_url(environ.get("REDISTOGO_URL"))
 
 FIELD_SIZE = 50
 CELL_SIZE = 8
-LOG_SIZE = 5
+LOG_SIZE = 100
 
 with open('wishes.txt', 'rt', encoding='utf-8') as f:
     wishes = f.read()
@@ -77,7 +77,6 @@ image = ["white" for i in range(size * size)]
 pixels = {str(i): color for i, color in enumerate(image)}
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
