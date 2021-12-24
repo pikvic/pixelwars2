@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMCT Pixel Wars</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lobster&family=Press+Start+2P&display=swap');
        
         @media (hover: hover) {
             .pixel:hover {
@@ -18,8 +18,8 @@
         }
         body {
             letter-spacing: 0.15em;
-            font-family: 'Lobster', cursive;
-            background: url("https://images.mirai.com/OFFERS%2FHOTELS%2F100130807%2FNAVIDADES2021_PACK-NAVIDAD_WEB.jpg") no-repeat center center fixed;
+            font-family: 'Press Start 2P', cursive;
+            background: url("/static/background.png") no-repeat center center fixed;
             background-size: cover;
             display: flex;
             align-items: center;
@@ -115,16 +115,21 @@
 
     <script>
 
+        function connect_and_get_websocket() {
+            let protocol = document.location.protocol == "https:" ? "wss" : "ws";
+            var ws = new WebSocket(`${protocol}://${document.location.host}/ws`);
+            return ws;
+        }
+
+        
         function get_random_phrase() {
             phrases = ['Отличный ход!', 'Прекрасный выбор!', 'Это настоящее цифровое искусство!', 'Перекрасим всё!', 'Наполним мир красками!', 'Так держать!'];
             let index = Math.floor(Math.random() * phrases.length);
-            console.log(phrases.length, index)
             return phrases[index];
         }
 
-        let protocol = document.location.protocol == "https:" ? "wss" : "ws";
-        var ws = new WebSocket(`${protocol}://${document.location.host}/ws`);
-
+        var ws = connect_and_get_websocket();
+  
         const parseCookie = str =>
             str
             .split(';')
@@ -134,10 +139,17 @@
                 return acc;
             }, {});
 
-        function changePixel(event) {
+
+        var last_pixel = undefined
+
+        async function changePixel(event) {
+            if (ws.readyState !== WebSocket.OPEN) {
+                return;
+            }
             let pixel = event.target;
-            let color = document.getElementById("color")
-            let cookies = parseCookie(document.cookie)
+            let color = document.getElementById("color");
+            let cookies = parseCookie(document.cookie);
+            last_pixel = pixel.id;
             ws.send(`${event.target.id} ${color.value} ${cookies.player_id}`);
         }
         let cooldown = document.getElementById("cooldown")
@@ -152,7 +164,10 @@
                 let color = msg[1];
                 let pixel = document.getElementById(id);
                 pixel.style.backgroundColor = color;
-                cooldown.textContent = get_random_phrase();
+                console.log(last_pixel, id)
+                if (last_pixel == id) {
+                    cooldown.textContent = get_random_phrase();
+                }                
             }
             if (message.data.includes("online")) {
                 let online_tag = document.getElementById("online");

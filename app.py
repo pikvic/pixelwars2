@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect, Response
+from fastapi.staticfiles import StaticFiles
 from fastapi import responses
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -6,10 +7,24 @@ from typing import List
 import random
 import datetime
 import uuid
+import aioredis
+from os import environ
+import psycopg2
 
+DB_URL = environ.get("DATABASE_URL")
+create_table_sql = '''create table IF NOT EXISTS logs (log_str text);'''
+insert_log_str = '''INSERT INTO logs (log_str) VALUES (%s)'''
+conn = psycopg2.connect(DB_URL)
+with conn:
+    with conn.cursor() as cur:
+        cur.execute(create_table_sql)
+        conn.commit()
+
+R = aioredis.from_url(environ.get("REDISTOGO_URL"))
 
 FIELD_SIZE = 50
 CELL_SIZE = 8
+LOG_SIZE = 5
 
 with open('wishes.txt', 'rt', encoding='utf-8') as f:
     wishes = f.read()
@@ -25,7 +40,6 @@ def cooldown(player_id, players, timeout=datetime.timedelta(seconds=3)):
         return True, timeout - timedelta 
     else: 
         return False, timeout - timedelta
-
      
 
 app = FastAPI()
@@ -57,9 +71,12 @@ manager = ConnectionManager()
 
 players = {}
 
-
 size = FIELD_SIZE
 image = ["white" for i in range(size * size)]
+
+pixels = {str(i): color for i, color in enumerate(image)}
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -94,6 +111,22 @@ async def websocket_endpoint(websocket: WebSocket):
                 image[index] = color
                 players[player_id] = datetime.datetime.now()
                 await manager.broadcast(f"{index_str} {color}")
+                
+                # save to redis and log DB
+                log_string = f'{index} {color} {player_id} {datetime.datetime.now().isoformat()}'
+                print(log_string)
+                try:
+                    await R.rpush("log", log_string)
+                except:
+                    print("cant push to redis")
+                if await R.llen("log") > LOG_SIZE:
+                    log_rows = [await R.lpop("log") for i in range(LOG_SIZE)]
+                    print(log_rows)
+                    with conn:
+                        with conn.cursor() as cur:
+                            cur.execute(insert_log_str, (str(log_rows),))
+                            conn.commit()
+
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         try:

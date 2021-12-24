@@ -6,15 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Новогоднее предсказание</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lobster&family=Press+Start+2P&display=swap');
        
         html {
             height: 100%;
         }
         body {
+            line-height: 3em;
             letter-spacing: 0.15em;
-            font-family: 'Lobster', cursive;
-            background: url("https://images.mirai.com/OFFERS%2FHOTELS%2F100130807%2FNAVIDADES2021_PACK-NAVIDAD_WEB.jpg") no-repeat center center fixed;
+            font-family: 'Press Start 2P', cursive;
+            background: url("/static/background.png") no-repeat center center fixed;
             background-size: cover;
             display: flex;
             align-items: center;
@@ -42,6 +43,18 @@
             margin: 20px auto;
             margin-bottom: 10px;
         }
+        h1 {
+            animation-duration: 1s;
+            animation-name: fadein;
+        }
+        #prewish {
+            animation-duration: 3s;
+            animation-name: fadein;
+        }
+        #wish {
+            animation-duration: 5s;
+            animation-name: fadein;
+        }
         .row {
             display: flex;
             width: fit-content;
@@ -51,15 +64,24 @@
         @media screen and (max-width: 600px) {
             body {
                 font-size: 0.8em;
-                background-position-x: 100%;
+                background-position-x: 50%;
                 
             }
             h1 {
-                font-size: 2em;
+                font-size: 1.2em;
+                margin: 0 auto;
             }
             h2 {
-                font-size: 1.5em;
+                margin-top: 0;
+                margin-bottom: 0;
+               font-size: 1em;
             }       
+        }
+
+        @keyframes fadein {
+            0% { opacity: 0; }
+            50% {opacity: 0; }
+            100% { opacity: 1;}
         }
     </style>
 </head>
@@ -67,10 +89,10 @@
     <div class="container">
         <h1>Новогоднее предсказание от ИМКТ</h1>
         <div class="row">
-            <h2>В новом 2022 году ты...</h2>
+            <h2 id="prewish">В новом 2022 году ты...</h2>
         </div>
         <div class="row">
-            <h2>...{{ wish }}!</h2>
+            <h2 id="wish">...{{ wish }}!</h2>
         </div>
 
 </body>
