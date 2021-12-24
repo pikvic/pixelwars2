@@ -3,6 +3,7 @@ from fastapi import responses
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from typing import List
+import random
 import datetime
 import uuid
 
@@ -10,6 +11,12 @@ import uuid
 FIELD_SIZE = 50
 CELL_SIZE = 8
 
+with open('wishes.txt', 'rt', encoding='utf-8') as f:
+    wishes = f.read()
+wishes = wishes.split('\n')
+
+def get_random_wish(wishes):
+    return random.choice(wishes)
 
 def cooldown(player_id, players, timeout=datetime.timedelta(seconds=3)):
     timestamp = players[player_id]
@@ -89,4 +96,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 await manager.broadcast(f"{index_str} {color}")
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-        await manager.broadcast(f"online {manager.get_online()}")
+        try:
+            await manager.broadcast(f"online {manager.get_online()}")
+        except:
+            pass
+
+
+@app.get("/wish", response_class=HTMLResponse)
+def wish(request: Request):
+    return templates.TemplateResponse("wish.html", {"request": request, "wish": get_random_wish(wishes)})
+    
