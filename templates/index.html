@@ -54,8 +54,8 @@
             align-items: center;
             user-select: none;
         }
-        
-        h1, h2 {
+         h1, h2 {
+            text-align: center;
             width: fit-content;
             margin: 20px auto;
             margin-bottom: 10px;
@@ -65,6 +65,10 @@
             width: fit-content;
             margin: 10px auto;
         }
+        .col {
+            text-align: center;
+        }
+
 
         @media screen and (max-width: 600px) {
             body {
@@ -81,8 +85,6 @@
                 grid-template-columns: repeat({{ field_size }}, 7px);
                 grid-template-rows: repeat({{ field_size }}, 7px);
             }
-           
-                    
         }
     </style>
 </head>
