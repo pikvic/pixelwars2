@@ -79,8 +79,8 @@ async def root(request: Request):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
-    await manager.broadcast(f"online {manager.get_online()}")
     try:
+        await manager.broadcast(f"online {manager.get_online()}")
         while True:
             data = await websocket.receive_text()
            # print(data, websocket)
