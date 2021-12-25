@@ -61,15 +61,15 @@ class ConnectionManager:
             try:
                 await websocket.send_text(message)
             except:
-                print("Error in send_personal")
-
+                pass
+            
     async def broadcast(self, message: str):
         for connection in self.active_connections:
             if connection.client_state.CONNECTED:
                 try:
                     await connection.send_text(message)
                 except:
-                    print("Error in broadcast")
+                    pass
             elif connection.client_state.DISCONNECTED:
                 self.disconnect(connection)
 
