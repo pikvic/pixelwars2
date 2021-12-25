@@ -57,17 +57,21 @@ class ConnectionManager:
         self.active_connections.remove(websocket)
 
     async def send_personal_message(self, message: str, websocket: WebSocket):
-        try:
-            await websocket.send_text(message)
-        except:
-            print("Error in send_personal")
+        if websocket.client_state.CONNECTED:
+            try:
+                await websocket.send_text(message)
+            except:
+                print("Error in send_personal")
 
     async def broadcast(self, message: str):
         for connection in self.active_connections:
-            try:
-                await connection.send_text(message)
-            except:
-                print("Error in broadcast")
+            if connection.client_state.CONNECTED:
+                try:
+                    await connection.send_text(message)
+                except:
+                    print("Error in broadcast")
+            elif connection.client_state.DISCONNECTED:
+                self.disconnect(connection)
 
             
     def get_online(self):
@@ -120,19 +124,19 @@ async def websocket_endpoint(websocket: WebSocket):
                 
                 # save to redis and log DB
                 log_string = f'{index} {color} {player_id} {datetime.datetime.now().isoformat()}'
-                print(log_string)
+                log_len = 0
                 try:
                     await R.rpush("log", log_string)
+                    log_len = await R.llen("log")
+                    if log_len > LOG_SIZE:
+                        log_rows = [await R.lpop("log") for i in range(LOG_SIZE)]
+                        with conn:
+                            with conn.cursor() as cur:
+                                cur.execute(insert_log_str, (str(log_rows),))
+                                conn.commit()
                 except:
                     print("cant push to redis")
-                if await R.llen("log") > LOG_SIZE:
-                    log_rows = [await R.lpop("log") for i in range(LOG_SIZE)]
-                    print(log_rows)
-                    with conn:
-                        with conn.cursor() as cur:
-                            cur.execute(insert_log_str, (str(log_rows),))
-                            conn.commit()
-
+                
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         try:
