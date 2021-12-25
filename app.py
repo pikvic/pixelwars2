@@ -57,11 +57,18 @@ class ConnectionManager:
         self.active_connections.remove(websocket)
 
     async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
+        try:
+            await websocket.send_text(message)
+        except:
+            print("Error in send_personal")
 
     async def broadcast(self, message: str):
         for connection in self.active_connections:
-            await connection.send_text(message)
+            try:
+                await connection.send_text(message)
+            except:
+                print("Error in broadcast")
+
             
     def get_online(self):
         return len(self.active_connections)
